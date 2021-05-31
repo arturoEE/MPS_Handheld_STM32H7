@@ -95,10 +95,10 @@ static void MX_USART1_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void MY_DDS9958_FUNCTION()
+void MY_DDS9958_FUNCTION_A()
 {
 	//LED turned on during DDS operation
-	HAL_GPIO_WritePin (GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
+	LL_GPIO_SetOutputPin(GPIOA, GPIO_PIN_0);
 
 	//Write the frequency and phase information for the DDS AD9958 below
 	//Refer to the Python code for correct numbers here
@@ -130,14 +130,14 @@ void MY_DDS9958_FUNCTION()
 
 	//------------------------------------
 	//Master reset pulse : Pulse of 1ms duration
-	HAL_GPIO_WritePin(GPIOA, DDS_RESET_Pin, GPIO_PIN_SET);
+	LL_GPIO_SetOutputPin(GPIOD, GPIO_PIN_2);
 	HAL_Delay(1);
-	HAL_GPIO_WritePin(GPIOA, DDS_RESET_Pin, GPIO_PIN_RESET);
+	LL_GPIO_ResetOutputPin(GPIOD, GPIO_PIN_2);
 	//------------------------------------
 
 	//------------------------------------
 	//Enable SPI communication on DDS : SDIO_3 pin should be pulled "LOW"
-	HAL_GPIO_WritePin(DDS_SDIO_3_GPIO_Port, DDS_SDIO_3_Pin, GPIO_PIN_RESET);
+	LL_GPIO_ResetOutputPin(GPIOD, GPIO_PIN_1);
 	HAL_Delay(1);
 	//------------------------------------
 
@@ -151,16 +151,16 @@ void MY_DDS9958_FUNCTION()
 	//Select channel-0 in CSR register : IO update toggle is not needed for channel selection
 	regBuff = CSR;
 	dataBuff = 0x70;	//0x40 is also valid
-	HAL_GPIO_WritePin (DDS_CS_GPIO_Port, DDS_CS_Pin, GPIO_PIN_RESET);
+	LL_GPIO_ResetOutputPin(GPIOB, GPIO_PIN_0);
 	HAL_SPI_Transmit (&hspi2, &regBuff, 1, 100);
 	HAL_SPI_Transmit (&hspi2, &dataBuff, 1, 100);
-	HAL_GPIO_WritePin (DDS_CS_GPIO_Port, DDS_CS_Pin, GPIO_PIN_SET);
+	LL_GPIO_SetOutputPin(GPIOB, GPIO_PIN_0);
 	//------------------------------------
 
 	//------------------------------------
 	//Frequency update for channel-0 : IO update toggle is needed
 	regBuff = CFTW;
-	HAL_GPIO_WritePin (DDS_CS_GPIO_Port, DDS_CS_Pin, GPIO_PIN_RESET);
+	LL_GPIO_ResetOutputPin(GPIOB, GPIO_PIN_0);
 	HAL_Delay(1);
 	HAL_SPI_Transmit (&hspi2, &regBuff, 1, 100);
 	HAL_SPI_Transmit (&hspi2, &ftwBytes0[0], 1, 100);	//MSB
@@ -168,11 +168,11 @@ void MY_DDS9958_FUNCTION()
 	HAL_SPI_Transmit (&hspi2, &ftwBytes0[2], 1, 100);
 	HAL_SPI_Transmit (&hspi2, &ftwBytes0[3], 1, 100);	//LSB
 	HAL_Delay(1);
-	HAL_GPIO_WritePin (DDS_CS_GPIO_Port, DDS_CS_Pin, GPIO_PIN_SET);
+	LL_GPIO_SetOutputPin(GPIOB, GPIO_PIN_0);
 
-	HAL_GPIO_WritePin(DDS_IO_UPDATE_GPIO_Port, DDS_IO_UPDATE_Pin, GPIO_PIN_SET);
+	LL_GPIO_SetOutputPin(GPIOD, GPIO_PIN_3);
 	HAL_Delay(1);
-	HAL_GPIO_WritePin(DDS_IO_UPDATE_GPIO_Port, DDS_IO_UPDATE_Pin, GPIO_PIN_RESET);
+	LL_GPIO_ResetOutputPin(GPIOD, GPIO_PIN_3);
 	//------------------------------------
 
 	//------------------------------------
@@ -180,50 +180,50 @@ void MY_DDS9958_FUNCTION()
 	//*Channel select is regenerated before sending the phase information
 	regBuff = CSR;
 	dataBuff = 0x70;	//0x40 is also valid
-	HAL_GPIO_WritePin (DDS_CS_GPIO_Port, DDS_CS_Pin, GPIO_PIN_RESET);
+	LL_GPIO_ResetOutputPin(GPIOB, GPIO_PIN_0);
 	HAL_SPI_Transmit (&hspi2, &regBuff, 1, 100);
 	HAL_SPI_Transmit (&hspi2, &dataBuff, 1, 100);
-	HAL_GPIO_WritePin (DDS_CS_GPIO_Port, DDS_CS_Pin, GPIO_PIN_SET);
+	LL_GPIO_SetOutputPin(GPIOB, GPIO_PIN_0);
 	//------------------------------------
 
 	//------------------------------------
 	//Phase update for channel-0 : IO update toggle is needed
 	regBuff = CPOW;
-	HAL_GPIO_WritePin (DDS_CS_GPIO_Port, DDS_CS_Pin, GPIO_PIN_RESET);
+	LL_GPIO_ResetOutputPin(GPIOB, GPIO_PIN_0);
 	HAL_SPI_Transmit (&hspi2, &regBuff, 1, 100);
 	HAL_SPI_Transmit (&hspi2, &powBytes0[0], 1, 100);	//MSB
 	HAL_SPI_Transmit (&hspi2, &powBytes0[1], 1, 100);	//LSB
-	HAL_GPIO_WritePin (DDS_CS_GPIO_Port, DDS_CS_Pin, GPIO_PIN_SET);
+	LL_GPIO_SetOutputPin(GPIOB, GPIO_PIN_0);
 
-	HAL_GPIO_WritePin(DDS_IO_UPDATE_GPIO_Port, DDS_IO_UPDATE_Pin, GPIO_PIN_SET);
+	LL_GPIO_SetOutputPin(GPIOD, GPIO_PIN_3);
 	HAL_Delay(1);
-	HAL_GPIO_WritePin(DDS_IO_UPDATE_GPIO_Port, DDS_IO_UPDATE_Pin, GPIO_PIN_RESET);
+	LL_GPIO_ResetOutputPin(GPIOD, GPIO_PIN_3);
 	//------------------------------------
 
 	//------------------------------------
 	//Select channel-1 in CSR register : IO update toggle is not needed for channel selection
 	regBuff = CSR;
 	dataBuff = 0xB0;	//0x80 is also valid
-	HAL_GPIO_WritePin (DDS_CS_GPIO_Port, DDS_CS_Pin, GPIO_PIN_RESET);
+	LL_GPIO_ResetOutputPin(GPIOB, GPIO_PIN_0);
 	HAL_SPI_Transmit (&hspi2, &regBuff, 1, 100);
 	HAL_SPI_Transmit (&hspi2, &dataBuff, 1, 100);
-	HAL_GPIO_WritePin (DDS_CS_GPIO_Port, DDS_CS_Pin, GPIO_PIN_SET);
+	LL_GPIO_SetOutputPin(GPIOB, GPIO_PIN_0);
 	//------------------------------------
 
 	//------------------------------------
 	//Frequency update for channel-1 : IO update toggle is needed
 	regBuff = CFTW;
-	HAL_GPIO_WritePin (DDS_CS_GPIO_Port, DDS_CS_Pin, GPIO_PIN_RESET);
+	LL_GPIO_ResetOutputPin(GPIOB, GPIO_PIN_0);
 	HAL_SPI_Transmit (&hspi2, &regBuff, 1, 100);
 	HAL_SPI_Transmit (&hspi2, &ftwBytes1[0], 1, 100);	//MSB
 	HAL_SPI_Transmit (&hspi2, &ftwBytes1[1], 1, 100);
 	HAL_SPI_Transmit (&hspi2, &ftwBytes1[2], 1, 100);
 	HAL_SPI_Transmit (&hspi2, &ftwBytes1[3], 1, 100);	//LSB
-	HAL_GPIO_WritePin (DDS_CS_GPIO_Port, DDS_CS_Pin, GPIO_PIN_SET);
+	LL_GPIO_SetOutputPin(GPIOB, GPIO_PIN_0);
 
-	HAL_GPIO_WritePin(DDS_IO_UPDATE_GPIO_Port, DDS_IO_UPDATE_Pin, GPIO_PIN_SET);
+	LL_GPIO_SetOutputPin(GPIOD, GPIO_PIN_3);
 	HAL_Delay(1);
-	HAL_GPIO_WritePin(DDS_IO_UPDATE_GPIO_Port, DDS_IO_UPDATE_Pin, GPIO_PIN_RESET);
+	LL_GPIO_ResetOutputPin(GPIOD, GPIO_PIN_3);
 	//------------------------------------
 
 	//------------------------------------
@@ -231,24 +231,186 @@ void MY_DDS9958_FUNCTION()
 	//*Channel select is regenerated before sending the phase information
 	regBuff = CSR;
 	dataBuff = 0xB0;	//0x80 is also valid
-	HAL_GPIO_WritePin (DDS_CS_GPIO_Port, DDS_CS_Pin, GPIO_PIN_RESET);
+	LL_GPIO_ResetOutputPin(GPIOB, GPIO_PIN_0);
 	HAL_SPI_Transmit (&hspi2, &regBuff, 1, 100);
 	HAL_SPI_Transmit (&hspi2, &dataBuff, 1, 100);
-	HAL_GPIO_WritePin (DDS_CS_GPIO_Port, DDS_CS_Pin, GPIO_PIN_SET);
+	LL_GPIO_SetOutputPin(GPIOB, GPIO_PIN_0);
 	//------------------------------------
 
 	//------------------------------------
 	//Phase update for channel-1 : IO update toggle is needed
 	regBuff = CPOW;
-	HAL_GPIO_WritePin (DDS_CS_GPIO_Port, DDS_CS_Pin, GPIO_PIN_RESET);
+	LL_GPIO_ResetOutputPin(GPIOB, GPIO_PIN_0);
 	HAL_SPI_Transmit (&hspi2, &regBuff, 1, 100);
 	HAL_SPI_Transmit (&hspi2, &powBytes1[0], 1, 100);	//MSB
 	HAL_SPI_Transmit (&hspi2, &powBytes1[1], 1, 100);	//LSB
-	HAL_GPIO_WritePin (DDS_CS_GPIO_Port, DDS_CS_Pin, GPIO_PIN_SET);
+	LL_GPIO_SetOutputPin(GPIOB, GPIO_PIN_0);
 
-	HAL_GPIO_WritePin(DDS_IO_UPDATE_GPIO_Port, DDS_IO_UPDATE_Pin, GPIO_PIN_SET);
+	LL_GPIO_SetOutputPin(GPIOD, GPIO_PIN_3);
 	HAL_Delay(1);
-	HAL_GPIO_WritePin(DDS_IO_UPDATE_GPIO_Port, DDS_IO_UPDATE_Pin, GPIO_PIN_RESET);
+	LL_GPIO_ResetOutputPin(GPIOD, GPIO_PIN_3);
+	//------------------------------------
+
+	//------------------------------------
+	//Disable SPI communication on DDS : SDIO_3 pin should be pulled "HIGH"
+	//TO make proper use of this, initiate SDIO_3 pin to logic "HIGH" state and pull down only when SPI operations are needed
+	//HAL_GPIO_WritePin(DDS_SDIO_3_GPIO_Port, DDS_SDIO_3_Pin, GPIO_PIN_SET);
+	//------------------------------------
+}
+void MY_DDS9958_FUNCTION_B()
+{
+	//LED turned on during DDS operation
+	LL_GPIO_SetOutputPin(GPIOA, GPIO_PIN_0);
+
+	//Write the frequency and phase information for the DDS AD9958 below
+	//Refer to the Python code for correct numbers here
+	FTW0 = 858993;	//5KHz
+	POW0 = 0;		//0 degree
+	FTW1 = 858993;	//5KHz
+	POW1 = 1500;	//90 degree - 4096; 4480; 1500
+
+	ftwBytes0[0] = FTW0 >> 24;	//MSB
+	ftwBytes0[1] = FTW0 >> 16;
+	ftwBytes0[2] = FTW0 >> 8;
+	ftwBytes0[3] = FTW0 >> 0;	//LSB
+
+	ftwBytes1[0] = FTW1 >> 24;	//MSB
+	ftwBytes1[1] = FTW1 >> 16;
+	ftwBytes1[2] = FTW1 >> 8;
+	ftwBytes1[3] = FTW1 >> 0;	//LSB
+
+	powBytes0[0] = POW0 >> 8;	//MSB
+	powBytes0[1] = POW0 >> 0;	//LSB
+
+	powBytes1[0] = POW1 >> 8;	//MSB
+	powBytes1[1] = POW1 >> 0;	//LSB
+
+
+	//************************************
+	//ADD DDS FUNCTIONALITY HERE
+	//************************************
+
+	//------------------------------------
+	//Master reset pulse : Pulse of 1ms duration
+	LL_GPIO_SetOutputPin(GPIOD, GPIO_PIN_10);
+	HAL_Delay(1);
+	LL_GPIO_ResetOutputPin(GPIOD, GPIO_PIN_10);
+	//------------------------------------
+
+	//------------------------------------
+	//Enable SPI communication on DDS : SDIO_3 pin should be pulled "LOW"
+	LL_GPIO_ResetOutputPin(GPIOD, GPIO_PIN_9);
+	HAL_Delay(1);
+	//------------------------------------
+
+	//------------------------------------
+	//Configure 3-wire SPI : *Redundant* if no read operations are performed
+	//write 0x72/42 into CSR register while configuring channel-0 updates
+	//write 0xB2/82 into CSR register while configuring channel-1 updates
+	//------------------------------------
+
+	//------------------------------------
+	//Select channel-0 in CSR register : IO update toggle is not needed for channel selection
+	regBuff = CSR;
+	dataBuff = 0x70;	//0x40 is also valid
+	LL_GPIO_ResetOutputPin(GPIOB, GPIO_PIN_1);
+	HAL_SPI_Transmit (&hspi2, &regBuff, 1, 100);
+	HAL_SPI_Transmit (&hspi2, &dataBuff, 1, 100);
+	LL_GPIO_SetOutputPin(GPIOB, GPIO_PIN_1);
+	//------------------------------------
+
+	//------------------------------------
+	//Frequency update for channel-0 : IO update toggle is needed
+	regBuff = CFTW;
+	LL_GPIO_ResetOutputPin(GPIOB, GPIO_PIN_1);
+	HAL_Delay(1);
+	HAL_SPI_Transmit (&hspi2, &regBuff, 1, 100);
+	HAL_SPI_Transmit (&hspi2, &ftwBytes0[0], 1, 100);	//MSB
+	HAL_SPI_Transmit (&hspi2, &ftwBytes0[1], 1, 100);
+	HAL_SPI_Transmit (&hspi2, &ftwBytes0[2], 1, 100);
+	HAL_SPI_Transmit (&hspi2, &ftwBytes0[3], 1, 100);	//LSB
+	HAL_Delay(1);
+	LL_GPIO_SetOutputPin(GPIOB, GPIO_PIN_1);
+
+	LL_GPIO_SetOutputPin(GPIOD, GPIO_PIN_11);
+	HAL_Delay(1);
+	LL_GPIO_ResetOutputPin(GPIOD, GPIO_PIN_11);
+	//------------------------------------
+
+	//------------------------------------
+	//Select channel-0 in CSR register : IO update toggle is not needed for channel selection
+	//*Channel select is regenerated before sending the phase information
+	regBuff = CSR;
+	dataBuff = 0x70;	//0x40 is also valid
+	LL_GPIO_ResetOutputPin(GPIOB, GPIO_PIN_1);
+	HAL_SPI_Transmit (&hspi2, &regBuff, 1, 100);
+	HAL_SPI_Transmit (&hspi2, &dataBuff, 1, 100);
+	LL_GPIO_SetOutputPin(GPIOB, GPIO_PIN_1);
+	//------------------------------------
+
+	//------------------------------------
+	//Phase update for channel-0 : IO update toggle is needed
+	regBuff = CPOW;
+	LL_GPIO_ResetOutputPin(GPIOB, GPIO_PIN_1);
+	HAL_SPI_Transmit (&hspi2, &regBuff, 1, 100);
+	HAL_SPI_Transmit (&hspi2, &powBytes0[0], 1, 100);	//MSB
+	HAL_SPI_Transmit (&hspi2, &powBytes0[1], 1, 100);	//LSB
+	LL_GPIO_SetOutputPin(GPIOB, GPIO_PIN_1);
+
+	LL_GPIO_SetOutputPin(GPIOD, GPIO_PIN_11);
+	HAL_Delay(1);
+	LL_GPIO_ResetOutputPin(GPIOD, GPIO_PIN_11);
+	//------------------------------------
+
+	//------------------------------------
+	//Select channel-1 in CSR register : IO update toggle is not needed for channel selection
+	regBuff = CSR;
+	dataBuff = 0xB0;	//0x80 is also valid
+	LL_GPIO_ResetOutputPin(GPIOB, GPIO_PIN_1);
+	HAL_SPI_Transmit (&hspi2, &regBuff, 1, 100);
+	HAL_SPI_Transmit (&hspi2, &dataBuff, 1, 100);
+	LL_GPIO_SetOutputPin(GPIOB, GPIO_PIN_1);
+	//------------------------------------
+
+	//------------------------------------
+	//Frequency update for channel-1 : IO update toggle is needed
+	regBuff = CFTW;
+	LL_GPIO_ResetOutputPin(GPIOB, GPIO_PIN_1);
+	HAL_SPI_Transmit (&hspi2, &regBuff, 1, 100);
+	HAL_SPI_Transmit (&hspi2, &ftwBytes1[0], 1, 100);	//MSB
+	HAL_SPI_Transmit (&hspi2, &ftwBytes1[1], 1, 100);
+	HAL_SPI_Transmit (&hspi2, &ftwBytes1[2], 1, 100);
+	HAL_SPI_Transmit (&hspi2, &ftwBytes1[3], 1, 100);	//LSB
+	LL_GPIO_SetOutputPin(GPIOB, GPIO_PIN_1);
+
+	LL_GPIO_SetOutputPin(GPIOD, GPIO_PIN_11);
+	HAL_Delay(1);
+	LL_GPIO_ResetOutputPin(GPIOD, GPIO_PIN_11);
+	//------------------------------------
+
+	//------------------------------------
+	//Select channel-1 in CSR register : IO update toggle is not needed for channel selection
+	//*Channel select is regenerated before sending the phase information
+	regBuff = CSR;
+	dataBuff = 0xB0;	//0x80 is also valid
+	LL_GPIO_ResetOutputPin(GPIOB, GPIO_PIN_1);
+	HAL_SPI_Transmit (&hspi2, &regBuff, 1, 100);
+	HAL_SPI_Transmit (&hspi2, &dataBuff, 1, 100);
+	LL_GPIO_SetOutputPin(GPIOB, GPIO_PIN_1);
+	//------------------------------------
+
+	//------------------------------------
+	//Phase update for channel-1 : IO update toggle is needed
+	regBuff = CPOW;
+	LL_GPIO_ResetOutputPin(GPIOB, GPIO_PIN_1);
+	HAL_SPI_Transmit (&hspi2, &regBuff, 1, 100);
+	HAL_SPI_Transmit (&hspi2, &powBytes1[0], 1, 100);	//MSB
+	HAL_SPI_Transmit (&hspi2, &powBytes1[1], 1, 100);	//LSB
+	LL_GPIO_SetOutputPin(GPIOB, GPIO_PIN_1);
+
+	LL_GPIO_SetOutputPin(GPIOD, GPIO_PIN_11);
+	HAL_Delay(1);
+	LL_GPIO_ResetOutputPin(GPIOD, GPIO_PIN_11);
 	//------------------------------------
 
 	//------------------------------------
@@ -265,6 +427,11 @@ void delay_10ns (uint16_t us)
 
 void adcRead1000(){
 	uint32_t i;
+	LL_GPIO_SetOutputPin(GPIOC, LL_GPIO_PIN_4);
+	LL_GPIO_SetOutputPin(GPIOC, LL_GPIO_PIN_5);
+	LL_GPIO_SetOutputPin(GPIOC, LL_GPIO_PIN_6);
+	LL_GPIO_SetOutputPin(GPIOC, LL_GPIO_PIN_7);
+	LL_GPIO_SetOutputPin(GPIOC, LL_GPIO_PIN_8);
 	for(i = 0; i<samplesize; i++){
 		LL_GPIO_SetOutputPin(GPIOA, LL_GPIO_PIN_7);
 		LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_7);
@@ -284,6 +451,11 @@ void adcRead1000(){
 		the_stuff[0][i] = (read_data >> 16);
 		//delay_10ns(sampleRateDivider);
 	}
+	LL_GPIO_ResetOutputPin(GPIOC, LL_GPIO_PIN_4);
+	LL_GPIO_ResetOutputPin(GPIOC, LL_GPIO_PIN_5);
+	LL_GPIO_ResetOutputPin(GPIOC, LL_GPIO_PIN_6);
+	LL_GPIO_ResetOutputPin(GPIOC, LL_GPIO_PIN_7);
+	LL_GPIO_ResetOutputPin(GPIOC, LL_GPIO_PIN_8);
 }
 
 void transmit1000(){
@@ -291,7 +463,7 @@ void transmit1000(){
 	uint32_t j;
 	for(i  = 0; i <samplesize; i++){
 		for(j = 0; j<3; j++){
-			HAL_UART_Transmit(&huart3, (uint8_t*)&the_stuff[j][i], sizeof(the_stuff[j][i]), 0xFFFF);
+			HAL_UART_Transmit(&huart1, (uint8_t*)&the_stuff[j][i], sizeof(the_stuff[j][i]), 0xFFFF);
 		}
 	}
 }
@@ -302,7 +474,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
 		FrequencyL = myRxData[0]*myRxData[1];
 		FreqFlag = 0;
 		FreqFlag2 = 1;
-		HAL_UART_Receive_DMA(&huart3, myRxData, 2);
+		HAL_UART_Receive_DMA(&huart1, myRxData, 2);
 		return;
 	}if(FreqFlag2 == 1){
 		if(myRxData[1] != 1){
@@ -312,14 +484,14 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
 		}
 		FreqFlag2 = 0;
 		needtoadj = 1;
-		HAL_UART_Receive_DMA(&huart3, myRxData, 2); // just kidding
+		HAL_UART_Receive_DMA(&huart1, myRxData, 2); // just kidding
 		return;
 	}*/
 	if((myRxData[0] == 'a' )&& (myRxData[1] == 'a')){
-		HAL_UART_Transmit(&huart3, (uint8_t * )&a[0], sizeof(a[0]), 0xFFFF);
+		HAL_UART_Transmit(&huart1, (uint8_t * )&a[0], sizeof(a[0]), 0xFFFF);
     }else if((myRxData[0] == 'b' )&& (myRxData[1] == 'b')){
     	adcRead1000();
-    	HAL_UART_Transmit(&huart3, (uint8_t * )&b[0], sizeof(b[0]), 0xFFFF);
+    	HAL_UART_Transmit(&huart1, (uint8_t * )&b[0], sizeof(b[0]), 0xFFFF);
     }else if((myRxData[0] == 'c' )&& (myRxData[1] == 'c')){
     	transmit1000();
 	}/*else if((myRxData[0] == 'l' )&& (myRxData[1] == 'l')){
@@ -327,7 +499,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
 	}else if(myRxData[0] == '1'){
 		d_to_dds[1] = myRxData[1];
 	}*/
-	HAL_UART_Receive_DMA(&huart3, myRxData, 2);
+	HAL_UART_Receive_DMA(&huart1, myRxData, 2);
 }
 /* USER CODE END 0 */
 
@@ -366,10 +538,11 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
   LL_SPI_Enable(SPI1);
-  HAL_UART_Receive_DMA(&huart3, myRxData, 2);
+  HAL_UART_Receive_DMA(&huart1, myRxData, 2);
   HAL_Delay(500);
 
-  MY_DDS9958_FUNCTION();
+  MY_DDS9958_FUNCTION_A();
+  MY_DDS9958_FUNCTION_B();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -519,11 +692,11 @@ static void MX_SPI1_Init(void)
   LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_SPI1);
   
   LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOA);
-  LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOD);
+  LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOB);
   /**SPI1 GPIO Configuration  
   PA5   ------> SPI1_SCK
   PA6   ------> SPI1_MISO
-  PD7   ------> SPI1_MOSI 
+  PB5   ------> SPI1_MOSI 
   */
   GPIO_InitStruct.Pin = LL_GPIO_PIN_5|LL_GPIO_PIN_6;
   GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
@@ -533,13 +706,13 @@ static void MX_SPI1_Init(void)
   GPIO_InitStruct.Alternate = LL_GPIO_AF_5;
   LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  GPIO_InitStruct.Pin = LL_GPIO_PIN_7;
+  GPIO_InitStruct.Pin = LL_GPIO_PIN_5;
   GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
   GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
   GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
   GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
   GPIO_InitStruct.Alternate = LL_GPIO_AF_5;
-  LL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+  LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /* USER CODE BEGIN SPI1_Init 1 */
 
@@ -547,11 +720,11 @@ static void MX_SPI1_Init(void)
   /* SPI1 parameter configuration*/
   SPI_InitStruct.TransferDirection = LL_SPI_FULL_DUPLEX;
   SPI_InitStruct.Mode = LL_SPI_MODE_MASTER;
-  SPI_InitStruct.DataWidth = LL_SPI_DATAWIDTH_4BIT;
+  SPI_InitStruct.DataWidth = LL_SPI_DATAWIDTH_12BIT;
   SPI_InitStruct.ClockPolarity = LL_SPI_POLARITY_LOW;
   SPI_InitStruct.ClockPhase = LL_SPI_PHASE_1EDGE;
   SPI_InitStruct.NSS = LL_SPI_NSS_SOFT;
-  SPI_InitStruct.BaudRate = LL_SPI_BAUDRATEPRESCALER_DIV2;
+  SPI_InitStruct.BaudRate = LL_SPI_BAUDRATEPRESCALER_DIV4;
   SPI_InitStruct.BitOrder = LL_SPI_MSB_FIRST;
   SPI_InitStruct.CRCCalculation = LL_SPI_CRCCALCULATION_DISABLE;
   SPI_InitStruct.CRCPoly = 0x0;
@@ -735,6 +908,12 @@ static void MX_GPIO_Init(void)
   LL_GPIO_ResetOutputPin(GPIOB, LL_GPIO_PIN_0|LL_GPIO_PIN_1);
 
   /**/
+  LL_GPIO_ResetOutputPin(GPIOD, LL_GPIO_PIN_8|LL_GPIO_PIN_9|LL_GPIO_PIN_10|LL_GPIO_PIN_11 
+                          |LL_GPIO_PIN_12|LL_GPIO_PIN_13|LL_GPIO_PIN_14|LL_GPIO_PIN_15 
+                          |LL_GPIO_PIN_0|LL_GPIO_PIN_1|LL_GPIO_PIN_2|LL_GPIO_PIN_3 
+                          |LL_GPIO_PIN_4|LL_GPIO_PIN_5|LL_GPIO_PIN_6|LL_GPIO_PIN_7);
+
+  /**/
   GPIO_InitStruct.Pin = LL_GPIO_PIN_0|LL_GPIO_PIN_7;
   GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
   GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_VERY_HIGH;
@@ -764,6 +943,17 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
   GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
   LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /**/
+  GPIO_InitStruct.Pin = LL_GPIO_PIN_8|LL_GPIO_PIN_9|LL_GPIO_PIN_10|LL_GPIO_PIN_11 
+                          |LL_GPIO_PIN_12|LL_GPIO_PIN_13|LL_GPIO_PIN_14|LL_GPIO_PIN_15 
+                          |LL_GPIO_PIN_0|LL_GPIO_PIN_1|LL_GPIO_PIN_2|LL_GPIO_PIN_3 
+                          |LL_GPIO_PIN_4|LL_GPIO_PIN_5|LL_GPIO_PIN_6|LL_GPIO_PIN_7;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
+  GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+  GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+  LL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
 }
 
